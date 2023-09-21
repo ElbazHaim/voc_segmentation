@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 class MobileNetV2Segmentation(pl.LightningModule):
     def __init__(self, in_channels, num_classes):
         super(MobileNetV2Segmentation, self).__init__()
+        self.hparams.learning_rate = 0.001
         self.save_hyperparameters()
         self.features = nn.Sequential(
             nn.Conv2d(in_channels, 32, kernel_size=3, stride=2, padding=1),

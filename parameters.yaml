@@ -3,5 +3,5 @@ num_classes: 20
 learning_rate: 0.001
 batch_size: 64
 num_epochs: 5
-data_dir: "data"
+data_dir: "/home/haim/hdd/data/voc/data"
 year: "2007"

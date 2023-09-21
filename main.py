@@ -22,10 +22,7 @@ if __name__ == "__main__":
         data_dir=DATA_DIR, year=YEAR, batch_size=BATCH_SIZE, num_workers=4
     )
 
-    model = MobileNetV2Segmentation(
-        in_channels=IN_CHANNELS,
-        num_classes=NUM_CLASSES
-    )
+    model = MobileNetV2Segmentation(in_channels=IN_CHANNELS, num_classes=NUM_CLASSES)
 
     trainer = pl.Trainer(
         logger=logger,
