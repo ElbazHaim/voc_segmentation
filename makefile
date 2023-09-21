@@ -1,5 +1,8 @@
 install:
 	pip install --upgrade pip &&\
+		pip install pytest
+		pip install black
+		pip install pylint
 		pip install -r requirements.txt
 
 test:
@@ -9,8 +12,7 @@ format:
 	black *.py
 
 lint:
-	pip install pylint &&\
-		pylint --output-format=colorized --disable=R,C *.py
+	pylint --output-format=colorized --disable=R,C *.py
 
 devrun:
 	python main.py --dev
