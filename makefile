@@ -19,6 +19,9 @@ devrun:
 	
 run:
 	python main.py	
+	
+eda:
+	python eda.py
 
 clean:
 	rm -r data &&\

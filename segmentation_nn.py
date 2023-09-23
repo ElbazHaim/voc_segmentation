@@ -35,6 +35,7 @@ class MobileNetV2Segmentation(pl.LightningModule):
 
     def _step(self, batch, batch_idx):
         inputs, targets = batch
+        print(inputs)
         outputs = self.forward(inputs)
         loss = self.criterion(outputs, targets)
         return loss, outputs, inputs
