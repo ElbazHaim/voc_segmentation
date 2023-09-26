@@ -7,3 +7,4 @@ onnx
 pylint
 black
 pytest
+matplotlib

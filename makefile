@@ -9,7 +9,7 @@ test:
 	python3 -m pytest -vv test_*.py
 
 format:
-	black *.py
+	@find "$(PWD)" -name "*.py" -exec black {} +
 
 lint:
 	pylint --output-format=colorized --disable=R,C *.py
@@ -29,5 +29,5 @@ clean:
 	rm -r tb_logs &&\
 	rm -r __pycache__
 
-all:
-	make install test format lint devrun
+download:
+	python datamodules/voc_dataset.py

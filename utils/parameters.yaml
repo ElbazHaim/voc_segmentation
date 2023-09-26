@@ -1,0 +1,7 @@
+in_channels: 3
+num_classes: 20
+learning_rate: 0.001
+batch_size: 4
+num_epochs: 5
+data_dir: "/home/haim/hdd/data/voc"
+year: "2012"

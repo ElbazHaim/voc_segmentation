@@ -1,7 +1,7 @@
 import yaml
 import argparse
 
-with open("parameters.yaml", "r") as yaml_file:
+with open("utils/parameters.yaml", "r") as yaml_file:
     parameters = yaml.safe_load(yaml_file)
 
 
