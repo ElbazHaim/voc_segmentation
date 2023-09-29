@@ -48,6 +48,7 @@ class UNet(nn.Module):
 class SegModel(pl.LightningModule):
     def __init__(self):
         super(SegModel, self).__init__()
+        self.example_input_array = torch.rand([4, 3, 255, 255])
         self.batch_size = 4
         self.learning_rate = 1e-3
         #         self.net = torchvision.models.segmentation.fcn_resnet50(pretrained = False, progress = True, num_classes = 19)
