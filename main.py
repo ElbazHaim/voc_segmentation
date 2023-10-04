@@ -1,39 +1,21 @@
+import yaml
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
+from datamodules.custom_modules import VOC2012SegmentationDataset
 
-from datamodules.voc_dataset import VOCSegDataModule
-from utils._utils import parameters  # , _get_dev_run
+with open("/home/haim/code/voc_segmentation/utils/parameters.yaml", "r") as yaml_file:
+    parameters = yaml.safe_load(yaml_file)
 
-from models.segmodel import SegModel
+DATA_DIR = parameters["data_dir"]
+image_dir = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/JPEGImages"
+mask_dir = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/SegmentationObject"
+train_file = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/ImageSets/Layout/train.txt"
 
-
-if __name__ == "__main__":
-    logger = TensorBoardLogger("tb_logs", "mnist_model_v0")
-    # fast_dev_run = _get_dev_run()
-    fast_dev_run = True
-    IN_CHANNELS = parameters["in_channels"]
-    NUM_CLASSES = parameters["num_classes"]
-    LEARNING_RATE = parameters["learning_rate"]
-    BATCH_SIZE = parameters["batch_size"]
-    NUM_EPOCHS = parameters["num_epochs"]
-    DATA_DIR = parameters["data_dir"]
-    YEAR = parameters["year"]
-
-    datamodule = VOCSegDataModule(
-        data_dir=DATA_DIR, year=YEAR, batch_size=BATCH_SIZE, num_workers=3
-    )
-
-    # model = MobileNetV2Segmentation(in_channels=IN_CHANNELS, num_classes=NUM_CLASSES)
-
-    model = SegModel()
-    trainer = pl.Trainer(
-        logger=logger,
-        accelerator="gpu",
-        max_epochs=NUM_EPOCHS,
-        fast_dev_run=fast_dev_run,
-    )
-    trainer.fit(model, datamodule)
-    # trainer.validate(model, datamodule)
-    # trainer.test(model, datamodule)
-
-    model.to_onnx("segmentation_model.onnx", export_params=True)
+train_dataset = VOC2012SegmentationDataset(
+    image_dir=image_dir,
+    mask_dir=mask_dir,
+    split="train",
+    transform=None,
+    train_file=train_file,
+)
+print(train_dataset.train_image_filenames)

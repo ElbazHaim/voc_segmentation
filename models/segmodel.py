@@ -48,7 +48,7 @@ class UNet(nn.Module):
 class SegModel(pl.LightningModule):
     def __init__(self):
         super(SegModel, self).__init__()
-        self.example_input_array = torch.rand([4, 3, 255, 255])
+        self.example_input_array = torch.rand([6, 3, 255, 255])
         self.batch_size = 4
         self.learning_rate = 1e-3
         #         self.net = torchvision.models.segmentation.fcn_resnet50(pretrained = False, progress = True, num_classes = 19)
@@ -69,7 +69,7 @@ class SegModel(pl.LightningModule):
 
     def forward(self, x):
         return self.net(x)
-    
+
     def training_step(self, batch, batch_nb):
         img, mask = batch
         img = img.float()
@@ -80,7 +80,36 @@ class SegModel(pl.LightningModule):
         # import sys
         # sys.exit()
         loss_val = F.cross_entropy(out, mask, ignore_index=250)
+        self.log_dict({"train_loss": loss_val}, on_step=True)
         return {"loss": loss_val}
+
+    def validation_step(self, batch, batch_nb):
+        img, mask = batch
+        img = img.float()
+        mask = mask.long()
+        out = self.forward(img)
+        # print(mask[:, 0, :, :].shape)
+        mask = mask[:, 0, :, :]
+        # import sys
+        # sys.exit()
+        loss_val = F.cross_entropy(out, mask, ignore_index=250)
+        self.log_dict(
+            {"val_loss": loss_val}, on_step=False, prog_bar=False, on_epoch=True
+        )
+        return {"loss": loss_val}
+
+    # def test_step(self, batch, batch_nb):
+    #     img, mask = batch
+    #     img = img.float()
+    #     mask = mask.long()
+    #     out = self.forward(img)
+    #     # print(mask[:, 0, :, :].shape)
+    #     mask = mask[:, 0, :, :]
+    #     # import sys
+    #     # sys.exit()
+    #     loss_val = F.cross_entropy(out, mask, ignore_index=250)
+    #     self.log_dict({"test_loss": loss_val})
+    #     return {"loss": loss_val}
 
     def configure_optimizers(self):
         opt = torch.optim.Adam(self.net.parameters(), lr=self.learning_rate)
