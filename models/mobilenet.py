@@ -64,8 +64,7 @@ class MobileNetV2Segmentation(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
 
-# Example usage
-num_classes = 21  # Replace with the actual number of segmentation classes
+num_classes = 21
 model = MobileNetV2Segmentation(num_classes=num_classes)
-trainer = pl.Trainer(gpus=1, max_epochs=10)  # Adjust max_epochs and gpus as needed
-trainer.fit(model, dataloader)  # Train your model using your data loader
+trainer = pl.Trainer(gpus=1, max_epochs=10) 
+trainer.fit(model, dataloader) 
