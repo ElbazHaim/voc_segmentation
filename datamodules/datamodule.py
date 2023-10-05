@@ -11,10 +11,8 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         self,
         batch_size,
         num_workers,
-        data_dir,
         image_dir,
         mask_dir,
-        split,
         image_transforms,
         mask_transforms,
         train_file,
@@ -23,10 +21,8 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.data_dir = data_dir
         self.image_dir = image_dir
         self.mask_dir = mask_dir
-        self.split = split
         self.image_transforms = image_transforms
         self.mask_transforms = mask_transforms
         self.train_file = train_file
@@ -36,28 +32,24 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         pass
 
     def setup(self, stage=None):
-        match self.split:
-            case "train":
-                self.train_dataset = VOC2012SegmentationDataset(
-                    image_dir=self.image_dir,
-                    mask_dir=self.mask_dir,
-                    split="train",
-                    image_transforms=self.image_transforms,
-                    mask_transforms=self.mask_transforms,
-                    train_file=self.train_file,
-                )
-            case "val":
-                self.val_dataset = VOC2012SegmentationDataset(
-                    image_dir=self.image_dir,
-                    mask_dir=self.mask_dir,
-                    split="val",
-                    image_transforms=self.image_transforms,
-                    mask_transforms=self.mask_transforms,
-                    val_file=self.val_file,
-                )
-            case _:
-                raise 'Unrecognizes split, use "train" or "val"'
-
+            self.train_dataset = VOC2012SegmentationDataset(
+                image_dir=self.image_dir,
+                mask_dir=self.mask_dir,
+                split="train",
+                image_transforms=self.image_transforms,
+                mask_transforms=self.mask_transforms,
+                train_file=self.train_file,
+            )
+            self.val_dataset = VOC2012SegmentationDataset(
+                image_dir=self.image_dir,
+                mask_dir=self.mask_dir,
+                split="val",
+                image_transforms=self.image_transforms,
+                mask_transforms=self.mask_transforms,
+                val_file=self.val_file,
+            )
+            
+            
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
