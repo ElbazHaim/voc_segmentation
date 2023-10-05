@@ -2,6 +2,7 @@ import os
 import re
 import pandas as pd
 import torch
+import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
@@ -13,32 +14,33 @@ class VOC2012SegmentationDataset(Dataset):
         image_dir,
         mask_dir,
         split="train",
-        transform=None,
+        image_transforms=None,
+        mask_transforms=None,
         train_file="",
         val_file="",
     ):
         self.split = split
-        self.transform = transform
+        self.image_transforms = image_transforms
+        self.mask_transforms = mask_transforms
         self.image_dir = os.path.join(image_dir)
         self.mask_dir = os.path.join(mask_dir)
         self.image_files = os.listdir(image_dir)
         match split:
             case "train":
-                self.image_names = self.get_case_file_names(
-                    filename=train_file)
+                self.image_names = self.get_case_file_names(filename=train_file)
             case "val":
-                self.get_case_file_names(filename=val_file)
+                self.image_names = self.get_case_file_names(filename=val_file)
             case _:
-                raise "No split case chosen"
+                raise 'Unrecognizes split, use "train" or "val"'
 
     def get_case_file_names(self, filename: str) -> list:
-        df = pd.read_csv(filename, delimiter=' ', header=None)
+        df = pd.read_csv(filename, header=None)
         filename_column = df[0]
         filenames = filename_column.to_list()
         return filenames
 
     def __len__(self):
-        return len(self.image_files)
+        return len(self.image_names)
 
     def __getitem__(self, idx):
         image_name = self.image_names[idx]
@@ -48,8 +50,9 @@ class VOC2012SegmentationDataset(Dataset):
         image = Image.open(img_name)
         mask = Image.open(mask_name)
 
-        if self.transform:
-            image = self.transform(image)
-            mask = self.transform(mask)
+        if self.image_transforms:
+            image = self.image_transforms(image)
+        if self.mask_transforms:
+            mask = self.mask_transforms(mask)
 
         return image, mask

@@ -1,21 +1,23 @@
 import yaml
+
+from PIL.Image import NEAREST
+
+from torch.utils.data import DataLoader
+
+from torchvision import transforms
+from torchvision.transforms import Compose, ToTensor, Normalize, Resize
+
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
-from datamodules.custom_modules import VOC2012SegmentationDataset
 
-with open("/home/haim/code/voc_segmentation/utils/parameters.yaml", "r") as yaml_file:
-    parameters = yaml.safe_load(yaml_file)
+from datamodules.dataset import VOC2012SegmentationDataset
 
-DATA_DIR = parameters["data_dir"]
-image_dir = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/JPEGImages"
-mask_dir = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/SegmentationObject"
-train_file = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/ImageSets/Layout/train.txt"
-
-train_dataset = VOC2012SegmentationDataset(
-    image_dir=image_dir,
-    mask_dir=mask_dir,
-    split="train",
-    transform=None,
-    train_file=train_file,
+IMAGE_DIR = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/JPEGImages"
+MASK_DIR = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/SegmentationObject"
+TRAIN_FILE = (
+    "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt"
 )
-print(train_dataset.train_image_filenames)
+
+
+if __name__ == "__main__":
+    print("hi")
