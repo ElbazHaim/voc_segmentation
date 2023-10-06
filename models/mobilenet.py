@@ -66,8 +66,6 @@ class MobileNetV2Segmentation(pl.LightningModule):
     def __init__(self, num_classes):
         super(MobileNetV2Segmentation, self).__init__()
 
-        
-
     def forward(self, x):
         features = self.mobilenet(x)
         segmentation = self.segmentation_head(features)
