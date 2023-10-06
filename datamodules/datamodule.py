@@ -32,24 +32,23 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         pass
 
     def setup(self, stage=None):
-            self.train_dataset = VOC2012SegmentationDataset(
-                image_dir=self.image_dir,
-                mask_dir=self.mask_dir,
-                split="train",
-                image_transforms=self.image_transforms,
-                mask_transforms=self.mask_transforms,
-                train_file=self.train_file,
-            )
-            self.val_dataset = VOC2012SegmentationDataset(
-                image_dir=self.image_dir,
-                mask_dir=self.mask_dir,
-                split="val",
-                image_transforms=self.image_transforms,
-                mask_transforms=self.mask_transforms,
-                val_file=self.val_file,
-            )
-            
-            
+        self.train_dataset = VOC2012SegmentationDataset(
+            image_dir=self.image_dir,
+            mask_dir=self.mask_dir,
+            split="train",
+            image_transforms=self.image_transforms,
+            mask_transforms=self.mask_transforms,
+            train_file=self.train_file,
+        )
+        self.val_dataset = VOC2012SegmentationDataset(
+            image_dir=self.image_dir,
+            mask_dir=self.mask_dir,
+            split="val",
+            image_transforms=self.image_transforms,
+            mask_transforms=self.mask_transforms,
+            val_file=self.val_file,
+        )
+
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
