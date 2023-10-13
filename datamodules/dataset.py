@@ -1,10 +1,6 @@
 import os
-import re
 import pandas as pd
-import torch
-import numpy as np
 from torch.utils.data import Dataset
-from torchvision import transforms
 from PIL import Image
 
 
@@ -31,7 +27,7 @@ class VOC2012SegmentationDataset(Dataset):
             case "val":
                 self.image_names = self.get_case_file_names(filename=val_file)
             case _:
-                raise 'Unrecognizes split, use "train" or "val"'
+                raise 'Unrecognized split, use "train" or "val"'
 
     def get_case_file_names(self, filename: str) -> list:
         df = pd.read_csv(filename, header=None)

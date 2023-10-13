@@ -3,7 +3,7 @@ from PIL.Image import NEAREST
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
-from dataset import VOC2012SegmentationDataset
+from .dataset import VOC2012SegmentationDataset
 
 
 class VOC2012SegmentationDataModule(pl.LightningDataModule):
@@ -27,9 +27,10 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         self.mask_transforms = mask_transforms
         self.train_file = train_file
         self.val_file = val_file
+        self.prepare_data()
 
     def prepare_data(self):
-        pass
+        self.setup()
 
     def setup(self, stage=None):
         self.train_dataset = VOC2012SegmentationDataset(
@@ -64,17 +65,3 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
             shuffle=True,
             num_workers=self.num_workers,
         )
-
-    image_transforms = Compose(
-        [
-            ToTensor(),
-            Resize((374, 500), antialias=True),
-        ]
-    )
-
-    mask_transforms = Compose(
-        [
-            ToTensor(),
-            Resize((374, 500), interpolation=NEAREST, antialias=True),
-        ]
-    )
