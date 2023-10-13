@@ -1,3 +1,6 @@
+"""
+Data module for VOC2012SegmentationDataset.
+"""
 import pytorch_lightning as pl
 from PIL.Image import NEAREST
 from torch.utils.data import DataLoader

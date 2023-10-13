@@ -1,3 +1,6 @@
+"""
+Main script for training a MobileNetV2-based segmentation model on VOC2012.
+"""
 from PIL.Image import NEAREST
 
 from torchvision.transforms import Compose, ToTensor, Resize, Lambda
@@ -53,4 +56,6 @@ trainer = pl.Trainer(
     fast_dev_run=True,
 )
 
-trainer.fit(model, datamodule)
+
+if __name__ == "__main__":
+    trainer.fit(model, datamodule)

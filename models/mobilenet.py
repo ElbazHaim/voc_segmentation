@@ -1,3 +1,6 @@
+"""
+Code for implementation of a tweaked MobilenetV2.
+"""
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
@@ -83,6 +86,7 @@ class Bottleneck(nn.Module):
 
 
 class MobileNetV2Segmentation(pl.LightningModule):
+    # TODO: Change name and extract to another file if combined with another known architecture.
     def __init__(self, num_classes):
         self.num_classes = num_classes
         super().__init__()

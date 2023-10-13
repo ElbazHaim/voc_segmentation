@@ -1,3 +1,6 @@
+"""
+This module contains the definition of the VOC2012SegmentationDataset class.
+"""
 import os
 import pandas as pd
 from torch.utils.data import Dataset
