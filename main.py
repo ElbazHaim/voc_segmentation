@@ -1,6 +1,7 @@
 """
 Main script for training a MobileNetV2-based segmentation model on VOC2012.
 """
+import yaml
 from PIL.Image import NEAREST
 
 from torchvision.transforms import Compose, ToTensor, Resize, Lambda
@@ -11,15 +12,18 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from datamodules.datamodule import VOC2012SegmentationDataModule
 from models.mobilenet import MobileNetV2Segmentation
 
-IMAGE_DIR = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/JPEGImages"
-MASK_DIR = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/SegmentationObject"
-TRAIN_FILE = (
-    "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt"
-)
-VAL_FILE = "/home/haim/hdd/data/voc/VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt"
-MAX_EPOCHS = 2
-BATCH_SIZE = 4
-NUM_WORKERS = 2
+
+with open('parameters.yaml', 'r') as file:
+    data = yaml.safe_load(file)
+
+IMAGE_DIR = data['image_dir']
+MASK_DIR = data['mask_dir']
+TRAIN_FILE = data['train_file']
+VAL_FILE = data['val_file']
+MAX_EPOCHS = data['max_epochs']
+BATCH_SIZE = data['batch_size']
+NUM_WORKERS = data['num_workers']
+NUM_CLASSES = data['num_classes']
 
 image_transforms = Compose(
     [

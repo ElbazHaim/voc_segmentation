@@ -3,3 +3,4 @@ data/*
 *tb_logs*
 *vscode*
 *.onnx
+*.yaml
