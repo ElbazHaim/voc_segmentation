@@ -1,9 +1,7 @@
 install:
-	pip install --upgrade pip &&\
-		pip install pytest
-		pip install black
-		pip install pylint
-		pip install -r requirements.txt
+	pip install --upgrade pip
+	pip install pytest black pylint
+	pip install -r requirements.txt
 
 test:
 	python3 -m pytest -vv test_*.py
@@ -19,9 +17,6 @@ devrun:
 	
 run:
 	python main.py	
-	
-eda:
-	python eda.py
 
 clean:
 	rm -r data &&\
