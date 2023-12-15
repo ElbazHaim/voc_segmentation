@@ -6,6 +6,7 @@ Credit goes to https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_mo
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import pytorch_lightning as pl
 
 
 class DoubleConv(nn.Module):
@@ -73,7 +74,7 @@ class Up(nn.Module):
 
 class OutConv(nn.Module):
     def __init__(self, in_channels, out_channels):
-        super(OutConv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
     def forward(self, x):
@@ -82,7 +83,7 @@ class OutConv(nn.Module):
 
 class UNet(nn.Module):
     def __init__(self, n_channels, n_classes, bilinear=False):
-        super(UNet, self).__init__()
+        super().__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
@@ -127,16 +128,17 @@ class UNet(nn.Module):
 
 class PlUNet(pl.LightningModule):
     def __init__(self, n_channels, n_classes, learning_rate=1e-3, bilinear=False):
-        super(UNet, self).__init__()
+        super().__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.learning_rate = learning_rate
         self.bilinear = bilinear
-
         self.unet = UNet(n_channels, n_classes, bilinear)
+
 
     def forward(self, x):
         return self.unet(x)
+
 
     def common_step(self, batch, batch_idx):
         inputs, masks = batch
@@ -144,15 +146,17 @@ class PlUNet(pl.LightningModule):
         masks = masks.type(torch.long)
         return nn.functional.cross_entropy(outputs, masks)
 
+
     def training_step(self, batch, batch_idx):
-        loss = self.common_step(self, batch, batch_idx)
+        loss = self.common_step(batch, batch_idx)
         self.log("train_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss = self.common_step(self, batch, batch_idx)
+        loss = self.common_step(batch, batch_idx)
         self.log("train_loss", loss)
         return loss
+
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)

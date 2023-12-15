@@ -12,7 +12,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from datamodules.datamodule import VOC2012SegmentationDataModule
 from models.mobilenet import MobileNetV2Segmentation
 from models.unet import PlUNet
-
+from transforms import image_transforms, mask_transforms
 
 with open("parameters.yaml", "r") as file:
     data = yaml.safe_load(file)
@@ -26,20 +26,6 @@ BATCH_SIZE = data["batch_size"]
 NUM_WORKERS = data["num_workers"]
 NUM_CLASSES = data["num_classes"]
 
-image_transforms = Compose(
-    [
-        ToTensor(),
-        Resize((374, 500), antialias=True),
-    ]
-)
-
-mask_transforms = Compose(
-    [
-        ToTensor(),
-        Resize((374, 500), interpolation=NEAREST, antialias=True),
-        Lambda(lambda x: x.squeeze(0)),
-    ]
-)
 
 datamodule = VOC2012SegmentationDataModule(
     batch_size=BATCH_SIZE,
@@ -58,7 +44,7 @@ trainer = pl.Trainer(
     max_epochs=MAX_EPOCHS,
     accelerator="gpu",
     devices=1,
-    fast_dev_run=True,
+    fast_dev_run=False,
 )
 
 

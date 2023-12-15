@@ -3,7 +3,6 @@ torchvision
 torchaudio
 lightning
 tensorboard
-onnx
 pylint
 black
 pytest

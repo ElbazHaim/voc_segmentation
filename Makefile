@@ -12,11 +12,14 @@ format:
 lint:
 	pylint --output-format=colorized --disable=R,C *.py
 
-devrun:
-	python main.py --dev
+traindev:
+	python train.py --dev
 	
-run:
-	python main.py	
+train:
+	python train.py	
+
+tune:
+	python tune.py
 
 clean:
 	rm -r data &&\

@@ -58,6 +58,7 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
+            pin_memory=True,
             num_workers=self.num_workers,
         )
 
@@ -65,6 +66,7 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         return DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=False,
+            pin_memory=True,
             num_workers=self.num_workers,
         )
