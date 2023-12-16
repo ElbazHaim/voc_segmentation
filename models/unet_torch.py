@@ -1,13 +1,13 @@
 """ 
-Parts of the U-Net model 
-Credit goes to https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_model.py
+Defines the parts of UNet and their construction to a single module.
+Credit:
+https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_model.py
 """
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
-import torchmetrics
+
 
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
@@ -17,10 +17,18 @@ class DoubleConv(nn.Module):
         if not mid_channels:
             mid_channels = out_channels
         self.double_conv = nn.Sequential(
-            nn.Conv2d(in_channels, mid_channels, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels, mid_channels, kernel_size=3, padding=1, bias=False
+            ),
             nn.BatchNorm2d(mid_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(mid_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(
+                mid_channels,
+                out_channels,
+                kernel_size=3,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
         )
@@ -50,7 +58,9 @@ class Up(nn.Module):
 
         # if bilinear, use the normal convolutions to reduce the number of channels
         if bilinear:
-            self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+            self.up = nn.Upsample(
+                scale_factor=2, mode="bilinear", align_corners=True
+            )
             self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
         else:
             self.up = nn.ConvTranspose2d(
@@ -64,7 +74,10 @@ class Up(nn.Module):
         diffY = x2.size()[2] - x1.size()[2]
         diffX = x2.size()[3] - x1.size()[3]
 
-        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2])
+        x1 = F.pad(
+            x1,
+            [diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2],
+        )
         # if you have padding issues, see
         # https://github.com/HaiyongJiang/U-Net-Pytorch-Unstructured-Buggy/commit/0e854509c2cea854e247a9c615f175f76fbb2e3a
         # https://github.com/xiaopeng-liao/Pytorch-UNet/commit/8ebac70e633bac59fc22bb5195e513d5832fb3bd
@@ -124,51 +137,3 @@ class UNet(nn.Module):
         self.up3 = torch.utils.checkpoint(self.up3)
         self.up4 = torch.utils.checkpoint(self.up4)
         self.outc = torch.utils.checkpoint(self.outc)
-
-
-class PlUNet(pl.LightningModule):
-    def __init__(self, n_channels, n_classes, learning_rate=1e-3, bilinear=False):
-        super().__init__()
-        self.n_channels = n_channels
-        self.n_classes = n_classes
-        self.learning_rate = learning_rate
-        self.bilinear = bilinear
-        self.unet = UNet(n_channels, n_classes, bilinear)
-
-
-    def forward(self, x):
-        return self.unet(x)
-
-
-    def common_step(self, batch, batch_idx):
-        inputs, masks = batch
-        outputs = self(inputs)
-        masks = masks.type(torch.long)
-        loss = nn.functional.cross_entropy(outputs, masks)
-        accuracy = torchmetrics.functional.accuracy(
-            y_hat, y, task="multiclass", num_classes=4
-        )
-        return loss
-
-
-    def training_step(self, batch, batch_idx):
-        loss, accuracy = self.common_step(batch, batch_idx)
-        self.log_dict({"train_loss", loss, "train_acc": accuracy})
-        return loss
-
-
-    def validation_step(self, batch, batch_idx):
-        loss, accuracy = self.common_step(batch, batch_idx)
-        self.log_dict({"val_loss", loss, "val_acc": accuracy})
-        return loss
-    
-    
-     def test_step(self, batch, batch_idx):
-        loss, accuracy = self.common_step(batch, batch_idx)
-        self.log_dict({"test_loss", loss, "test_acc": accuracy})
-        return loss
-
-
-    def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        return optimizer

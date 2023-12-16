@@ -1,17 +1,15 @@
 """
 
 """
-from pathlib import Path
 import yaml
 import optuna
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
-from models.unet import PlUNet
+from models import PlUNet
 from transforms import image_transforms, mask_transforms
-from datamodules.datamodule import VOC2012SegmentationDataModule
+from datamodules import VOC2012SegmentationDataModule
 
 
-with open("parameters.yaml", "r") as file:
+with open("parameters.yaml", "r", encoding="utf-8") as file:
     params = yaml.safe_load(file)
 
 IMAGE_DIR = params["image_dir"]
@@ -29,11 +27,13 @@ INPUT_SHAPE = tuple(params["input_shape"])
 
 def objective(trial: optuna.trial.Trial) -> float:
     learning_rate = trial.suggest_loguniform("learning_rate", 1e-9, 1e-3)
+    bilinear = trial.suggest_categorical("bilinear", [True, False])
 
     model = PlUNet(
-        input_shape=INPUT_SHAPE,
-        num_classes=NUM_CLASSES,
+        n_channels=3,
+        n_classes=NUM_CLASSES,
         learning_rate=learning_rate,
+        bilinear=bilinear,
     )
 
     datamodule = VOC2012SegmentationDataModule(
@@ -64,7 +64,7 @@ def objective(trial: optuna.trial.Trial) -> float:
             )
         ],
     )
-    hyperparameters = dict(learning_rate=learning_rate)
+    hyperparameters = dict(learning_rate=learning_rate, bilinear=bilinear)
     trainer.logger.log_hyperparams(hyperparameters)
 
     trainer.fit(model, datamodule=datamodule)
@@ -74,7 +74,22 @@ def objective(trial: optuna.trial.Trial) -> float:
 
 if __name__ == "__main__":
     prune = False
-    pruner = optuna.pruners.MedianPruner() if prune else optuna.pruners.NopPruner()
-
+    pruner = (
+        optuna.pruners.MedianPruner() if prune else optuna.pruners.NopPruner()
+    )
     study = optuna.create_study(direction="minimize", pruner=pruner)
     study.optimize(objective, n_trials=N_TRIALS, timeout=TIMEOUT)
+    
+    best_trial_value = study.best_trial.value
+    best_trial_params = study.best_trial.params
+    
+    with open("best_params.yaml", "w", encoding="utf-8") as file:
+        yaml.dump(best_trial_params, file)
+        print("Best params saved to best_params.yaml")
+
+    print("Best trial:")
+    print(f"Value: {best_trial_value}")
+
+    print("Params: ")
+    for key, value in best_trial_params.items():
+        print("{key}: {value}")

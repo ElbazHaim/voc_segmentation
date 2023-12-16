@@ -1,7 +1,7 @@
 """
 This module contains the definition of the VOC2012SegmentationDataset class.
 """
-from torch import Generator
+import os
 from pathlib import Path
 import pandas as pd
 from torch.utils.data import Dataset, random_split

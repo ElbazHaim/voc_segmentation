@@ -1,0 +1,1 @@
+from datamodule import VOC2012SegmentationDataModule

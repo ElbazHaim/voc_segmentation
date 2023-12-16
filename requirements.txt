@@ -7,3 +7,5 @@ pylint
 black
 pytest
 matplotlib
+icecream
+pandas

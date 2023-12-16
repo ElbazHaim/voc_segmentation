@@ -2,19 +2,12 @@
 Main script for training a MobileNetV2-based segmentation model on VOC2012.
 """
 import yaml
-from PIL.Image import NEAREST
-
-from torchvision.transforms import Compose, ToTensor, Resize, Lambda
-
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
-
-from datamodules.datamodule import VOC2012SegmentationDataModule
-from models.mobilenet import MobileNetV2Segmentation
-from models.unet import PlUNet
+from models import PlUNet
+from datamodules import VOC2012SegmentationDataModule
 from transforms import image_transforms, mask_transforms
 
-with open("parameters.yaml", "r") as file:
+with open("parameters.yaml", "r", encoding="utf-8") as file:
     data = yaml.safe_load(file)
 
 IMAGE_DIR = data["image_dir"]
@@ -50,3 +43,5 @@ trainer = pl.Trainer(
 
 if __name__ == "__main__":
     trainer.fit(model, datamodule)
+    trainer.save_checkpoint("model.ckpt")
+    trainer.test(model, datamodule)

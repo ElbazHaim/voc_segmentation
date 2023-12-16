@@ -3,9 +3,8 @@ Data module for VOC2012SegmentationDataset.
 """
 import pytorch_lightning as pl
 from PIL.Image import NEAREST
-from torch.utils.data import DataLoader
-from torchvision.transforms import Compose, ToTensor, Normalize, Resize
-
+from torch import Generator
+from torch.utils.data import DataLoader, random_split
 from .dataset import VOC2012SegmentationDataset
 
 
@@ -18,8 +17,10 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         mask_dir,
         image_transforms,
         mask_transforms,
-        train_file,
-        val_file,
+        train_file=None,
+        val_file=None,
+        trainval_file=None,
+        random_seed: int = 42,
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -30,28 +31,30 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
         self.mask_transforms = mask_transforms
         self.train_file = train_file
         self.val_file = val_file
-        self.prepare_data()
+        self.trainval_file = trainval_file
+        self.random_seed = random_seed
+        self.prepare_datasets()
 
-    def prepare_data(self):
+    def prepare_datasets(self):
         self.setup()
 
     def setup(self, stage=None):
-        self.train_dataset = VOC2012SegmentationDataset(
+        dataset = VOC2012SegmentationDataset(
             image_dir=self.image_dir,
             mask_dir=self.mask_dir,
-            split="train",
+            split="trainval",
             image_transforms=self.image_transforms,
             mask_transforms=self.mask_transforms,
-            train_file=self.train_file,
+            trainval_file=self.trainval_file,
         )
-        self.val_dataset = VOC2012SegmentationDataset(
-            image_dir=self.image_dir,
-            mask_dir=self.mask_dir,
-            split="val",
-            image_transforms=self.image_transforms,
-            mask_transforms=self.mask_transforms,
-            val_file=self.val_file,
+        train_dataset, val_dataset, test_dataset = random_split(
+            dataset=dataset,
+            lengths=[0.6, 0.2, 0.2],
+            generator=Generator().manual_seed(self.random_seed),
         )
+        self.train_dataset = train_dataset
+        self.val_dataset = val_dataset
+        self.test_dataset = test_dataset
 
     def train_dataloader(self):
         return DataLoader(
@@ -65,6 +68,15 @@ class VOC2012SegmentationDataModule(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(
             self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            pin_memory=True,
+            num_workers=self.num_workers,
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
             batch_size=self.batch_size,
             shuffle=False,
             pin_memory=True,

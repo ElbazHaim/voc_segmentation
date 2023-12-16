@@ -7,7 +7,7 @@ test:
 	python3 -m pytest -vv test_*.py
 
 format:
-	@find "$(PWD)" -name "*.py" -exec black {} +
+	@find "$(PWD)" -name "*.py" -exec black --line-length=79 {} +
 
 lint:
 	pylint --output-format=colorized --disable=R,C *.py

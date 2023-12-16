@@ -1,5 +1,5 @@
 """
-Code for implementation of a tweaked MobilenetV2.
+This module implements a tweaked MobilenetV2.
 """
 import torch
 import torch.nn as nn
@@ -92,7 +92,9 @@ class MobileNetV2Segmentation(pl.LightningModule):
         super().__init__()
 
         self.feature_extractor = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.Conv2d(
+                3, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)
+            ),
             Bottleneck(32, 16, 1, 1),
             Bottleneck(16, 24, 6, 2),
             Bottleneck(24, 24, 6, 1),
@@ -130,7 +132,7 @@ class MobileNetV2Segmentation(pl.LightningModule):
         loss = nn.functional.cross_entropy(outputs, masks)
         self.log("train_loss", loss)
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
         inputs, masks = batch
         outputs = self(inputs)
