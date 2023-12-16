@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-
+import torchmetrics
 
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
@@ -144,17 +144,28 @@ class PlUNet(pl.LightningModule):
         inputs, masks = batch
         outputs = self(inputs)
         masks = masks.type(torch.long)
-        return nn.functional.cross_entropy(outputs, masks)
+        loss = nn.functional.cross_entropy(outputs, masks)
+        accuracy = torchmetrics.functional.accuracy(
+            y_hat, y, task="multiclass", num_classes=4
+        )
+        return loss
 
 
     def training_step(self, batch, batch_idx):
-        loss = self.common_step(batch, batch_idx)
-        self.log("train_loss", loss)
+        loss, accuracy = self.common_step(batch, batch_idx)
+        self.log_dict({"train_loss", loss, "train_acc": accuracy})
         return loss
 
+
     def validation_step(self, batch, batch_idx):
-        loss = self.common_step(batch, batch_idx)
-        self.log("train_loss", loss)
+        loss, accuracy = self.common_step(batch, batch_idx)
+        self.log_dict({"val_loss", loss, "val_acc": accuracy})
+        return loss
+    
+    
+     def test_step(self, batch, batch_idx):
+        loss, accuracy = self.common_step(batch, batch_idx)
+        self.log_dict({"test_loss", loss, "test_acc": accuracy})
         return loss
 
 

@@ -130,6 +130,13 @@ class MobileNetV2Segmentation(pl.LightningModule):
         loss = nn.functional.cross_entropy(outputs, masks)
         self.log("train_loss", loss)
         return loss
+    
+    def validation_step(self, batch, batch_idx):
+        inputs, masks = batch
+        outputs = self(inputs)
+        loss = nn.functional.cross_entropy(outputs, masks)
+        self.log("val_loss", loss)
+        return loss
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)

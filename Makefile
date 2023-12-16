@@ -31,4 +31,4 @@ download:
 	python datamodules/voc_dataset.py
 
 tensorboard:
-	tensorboard --logdir="/home/haim/code/unet_voc/tb_logs/" --bind_all
+	tensorboard --logdir="/home/haim/code/voc_segmentation/lightning_logs/" --host localhost --port 8080
