@@ -4,7 +4,7 @@ Pytorch lightning module for U-Net.
 import torch
 import pytorch_lightning as pl
 import torchmetrics
-from unet_torch import UNet
+from .unet_torch import UNet
 
 
 class PlUNet(pl.LightningModule):

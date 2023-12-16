@@ -1,1 +1,1 @@
-from datamodule import VOC2012SegmentationDataModule
+from .datamodule import VOC2012SegmentationDataModule

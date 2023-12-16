@@ -18,13 +18,14 @@ class VOC2012SegmentationDataset(Dataset):
         mask_transforms=None,
         train_file="",
         val_file="",
+        trainval_file="",
     ):
         self.split = split
         self.image_transforms = image_transforms
         self.mask_transforms = mask_transforms
         self.image_dir = Path(image_dir)
         self.mask_dir = Path(mask_dir)
-        self.image_files = list((image_dir).listdir())
+        self.image_files = list(self.image_dir.iterdir())
         match split:
             case "train":
                 self.image_names = self.get_case_file_names(
@@ -32,8 +33,12 @@ class VOC2012SegmentationDataset(Dataset):
                 )
             case "val":
                 self.image_names = self.get_case_file_names(filename=val_file)
+            case "trainval":
+                self.image_names = self.get_case_file_names(
+                    filename=trainval_file
+                )
             case _:
-                raise 'Unrecognized split, use "train" or "val"'
+                raise 'Unrecognized split, use "train", "val" or "trainval"'
 
     def get_case_file_names(self, filename: str) -> list:
         df = pd.read_csv(filename, header=None)

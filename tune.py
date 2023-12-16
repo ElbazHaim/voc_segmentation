@@ -16,6 +16,7 @@ IMAGE_DIR = params["image_dir"]
 MASK_DIR = params["mask_dir"]
 TRAIN_FILE = params["train_file"]
 VAL_FILE = params["val_file"]
+TRAINVAL_FILE = params["trainval_file"]
 MAX_EPOCHS = params["max_epochs"]
 BATCH_SIZE = params["batch_size"]
 NUM_WORKERS = params["num_workers"]
@@ -43,8 +44,7 @@ def objective(trial: optuna.trial.Trial) -> float:
         mask_dir=MASK_DIR,
         image_transforms=image_transforms,
         mask_transforms=mask_transforms,
-        train_file=TRAIN_FILE,
-        val_file=VAL_FILE,
+        trainval_file=TRAINVAL_FILE,
     )
 
     trainer = pl.Trainer(
@@ -79,10 +79,10 @@ if __name__ == "__main__":
     )
     study = optuna.create_study(direction="minimize", pruner=pruner)
     study.optimize(objective, n_trials=N_TRIALS, timeout=TIMEOUT)
-    
+
     best_trial_value = study.best_trial.value
     best_trial_params = study.best_trial.params
-    
+
     with open("best_params.yaml", "w", encoding="utf-8") as file:
         yaml.dump(best_trial_params, file)
         print("Best params saved to best_params.yaml")
